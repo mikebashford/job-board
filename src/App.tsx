@@ -1,9 +1,9 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 
 const App = () => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(0)
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200">
@@ -37,21 +37,18 @@ const App = () => {
       <div className="bg-white rounded-xl shadow-md p-8 flex flex-col items-center mb-6">
         <button
           className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 mb-4"
-          onClick={() => setCount((count) => count + 1)}
+          onClick={() => setCount(count => count + 1)}
           aria-label="Increment count"
         >
           count is {count}
         </button>
         <p className="text-gray-600">
-          Edit <code className="bg-gray-100 px-1 rounded">src/App.tsx</code> and
-          save to test HMR
+          Edit <code className="bg-gray-100 px-1 rounded">src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="text-gray-500 text-sm">
-        Click on the Vite and React logos to learn more
-      </p>
+      <p className="text-gray-500 text-sm">Click on the Vite and React logos to learn more</p>
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
