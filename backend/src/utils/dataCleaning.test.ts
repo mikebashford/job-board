@@ -3,6 +3,7 @@ import {
   removeSpecialCharacters,
   stripHtmlTags,
   normalizeCase,
+  normalizeLocation,
 } from './dataCleaning';
 
 describe('dataCleaning utilities', () => {
@@ -29,5 +30,39 @@ describe('dataCleaning utilities', () => {
     expect(normalizeCase('hello world')).toBe('Hello World');
     expect(normalizeCase('COMPANY NAME')).toBe('Company Name');
     expect(normalizeCase('mIxEd CaSe')).toBe('Mixed Case');
+  });
+
+  test('normalizeLocation parses and normalizes locations', () => {
+    expect(normalizeLocation('New York, NY, USA')).toEqual({
+      city: 'New York',
+      state: 'New York',
+      country: 'USA',
+    });
+    expect(normalizeLocation('San Francisco, CA')).toEqual({
+      city: 'San Francisco',
+      state: 'California',
+    });
+    expect(normalizeLocation('London, UK')).toEqual({
+      city: 'London',
+      country: 'UK',
+    });
+    expect(normalizeLocation('Austin, TX, 78701, USA')).toEqual({
+      city: 'Austin',
+      state: 'Texas',
+      zip: '78701',
+      country: 'USA',
+    });
+    expect(normalizeLocation('Berlin')).toEqual({ city: 'Berlin' });
+    expect(normalizeLocation('')).toEqual({});
+    expect(normalizeLocation('Chicago, IL, USA')).toEqual({
+      city: 'Chicago',
+      state: 'Illinois',
+      country: 'USA',
+    });
+    expect(normalizeLocation('Toronto, ON, Canada')).toEqual({
+      city: 'Toronto',
+      state: 'ON',
+      country: 'Canada',
+    });
   });
 });
