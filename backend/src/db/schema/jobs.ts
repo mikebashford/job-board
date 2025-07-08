@@ -1,0 +1,35 @@
+import {
+  pgTable,
+  serial,
+  varchar,
+  text,
+  boolean,
+  integer,
+  timestamp,
+  jsonb,
+  date,
+} from 'drizzle-orm/pg-core';
+
+export const jobs = pgTable('jobs', {
+  id: serial('id').primaryKey(),
+  sourceId: varchar('source_id', { length: 255 }).notNull(),
+  sourceName: varchar('source_name', { length: 100 }).notNull(),
+  title: varchar('title', { length: 255 }).notNull(),
+  companyName: varchar('company_name', { length: 255 }).notNull(),
+  location: jsonb('location').$type<unknown>(), // structured: city, state, country, zip
+  isRemote: boolean('is_remote'),
+  description: text('description'),
+  url: varchar('url', { length: 512 }),
+  postedDate: date('posted_date'),
+  expirationDate: date('expiration_date'),
+  salaryMin: integer('salary_min'),
+  salaryMax: integer('salary_max'),
+  salaryCurrency: varchar('salary_currency', { length: 10 }),
+  jobType: varchar('job_type', { length: 50 }),
+  experienceLevel: varchar('experience_level', { length: 50 }),
+  skills: jsonb('skills').$type<string[]>(),
+  industry: varchar('industry', { length: 100 }),
+  normalizedCompanyName: varchar('normalized_company_name', { length: 255 }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
