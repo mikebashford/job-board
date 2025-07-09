@@ -138,3 +138,79 @@ export const normalizeLocation = (input: string): JobLocation => {
   }
   return { city, state, country, zip };
 };
+
+/**
+ * Canonical skill set and alias mapping for normalization.
+ * Add more skills and aliases as needed.
+ */
+const SKILL_ALIASES: Record<string, string> = {
+  js: 'JavaScript',
+  javascript: 'JavaScript',
+  'react.js': 'React',
+  reactjs: 'React',
+  react: 'React',
+  ts: 'TypeScript',
+  typescript: 'TypeScript',
+  'node.js': 'Node.js',
+  nodejs: 'Node.js',
+  node: 'Node.js',
+  html: 'HTML',
+  css: 'CSS',
+  sass: 'Sass',
+  scss: 'Sass',
+  tailwind: 'TailwindCSS',
+  tailwindcss: 'TailwindCSS',
+  redux: 'Redux',
+  zustand: 'Zustand',
+  jotai: 'Jotai',
+  'next.js': 'Next.js',
+  nextjs: 'Next.js',
+  vite: 'Vite',
+  express: 'Express',
+  nestjs: 'NestJS',
+  postgresql: 'PostgreSQL',
+  postgres: 'PostgreSQL',
+  mongodb: 'MongoDB',
+  elasticsearch: 'Elasticsearch',
+  redis: 'Redis',
+  aws: 'AWS',
+  gcp: 'GCP',
+  azure: 'Azure',
+  docker: 'Docker',
+  kubernetes: 'Kubernetes',
+  jest: 'Jest',
+  cypress: 'Cypress',
+  playwright: 'Playwright',
+  puppeteer: 'Puppeteer',
+  python: 'Python',
+  fastapi: 'FastAPI',
+  django: 'Django',
+  scrapy: 'Scrapy',
+  beautifulsoup: 'BeautifulSoup',
+  sql: 'SQL',
+  graphql: 'GraphQL',
+  rest: 'REST',
+  api: 'API',
+  // Add more as needed
+};
+
+/**
+ * Extracts and normalizes skills from a string using a predefined skill set and alias mapping.
+ * Returns an array of canonical skill names (deduplicated).
+ *
+ * @param input - The text to extract skills from (e.g., job description, requirements)
+ */
+export const extractSkills = (input: string): string[] => {
+  if (!input) return [];
+  const foundSkills = new Set<string>();
+  const lowerInput = input.toLowerCase();
+  // Check for each alias in the input
+  for (const [alias, canonical] of Object.entries(SKILL_ALIASES)) {
+    // Use word boundaries to avoid partial matches
+    const regex = new RegExp(`\\b${alias.replace(/\./g, '\\.')}(s)?\\b`, 'i');
+    if (regex.test(lowerInput)) {
+      foundSkills.add(canonical);
+    }
+  }
+  return Array.from(foundSkills);
+};

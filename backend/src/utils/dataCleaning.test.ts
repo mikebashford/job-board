@@ -4,6 +4,7 @@ import {
   stripHtmlTags,
   normalizeCase,
   normalizeLocation,
+  extractSkills,
 } from './dataCleaning';
 
 describe('dataCleaning utilities', () => {
@@ -64,5 +65,40 @@ describe('dataCleaning utilities', () => {
       state: 'ON',
       country: 'Canada',
     });
+  });
+});
+
+describe('extractSkills', () => {
+  test('extracts and normalizes single skill', () => {
+    expect(extractSkills('Looking for a JavaScript developer')).toEqual([
+      'JavaScript',
+    ]);
+    expect(extractSkills('Experience with React.js required')).toEqual([
+      'React',
+    ]);
+    expect(extractSkills('Must know TS and Node.js')).toEqual([
+      'TypeScript',
+      'Node.js',
+    ]);
+  });
+
+  test('extracts multiple skills and deduplicates', () => {
+    expect(
+      extractSkills(
+        'We use React, Redux, TypeScript, and React.js in our stack'
+      )
+    ).toEqual(['React', 'Redux', 'TypeScript']);
+  });
+
+  test('handles aliases and ignores case', () => {
+    expect(
+      extractSkills('Skills: js, reactjs, nodejs, HTML, CSS, tailwindcss')
+    ).toEqual(['JavaScript', 'React', 'Node.js', 'HTML', 'CSS', 'TailwindCSS']);
+  });
+
+  test('returns empty array for no matches or empty input', () => {
+    expect(extractSkills('No relevant skills here')).toEqual([]);
+    expect(extractSkills('')).toEqual([]);
+    expect(extractSkills(undefined as unknown as string)).toEqual([]);
   });
 });
