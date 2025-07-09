@@ -99,7 +99,6 @@ const US_STATE_MAP: Record<string, string> = {
  */
 export const normalizeLocation = (input: string): JobLocation => {
   if (!input) return {};
-  // Split by comma, trim whitespace
   const parts = input
     .split(',')
     .map((part) => part.trim())
@@ -121,7 +120,6 @@ export const normalizeLocation = (input: string): JobLocation => {
     }
   }
   if (parts.length > 2) {
-    // If third part is a zip code (all digits or digits+letters), else country
     if (/^\d{5}(-\d{4})?$/.test(parts[2])) {
       zip = parts[2];
     } else {
@@ -129,14 +127,19 @@ export const normalizeLocation = (input: string): JobLocation => {
     }
   }
   if (parts.length > 3) {
-    // If fourth part exists, treat as country or zip
     if (!country && /^[A-Za-z]{2,}$/.test(parts[3])) {
       country = parts[3];
     } else if (!zip && /^\d{5}(-\d{4})?$/.test(parts[3])) {
       zip = parts[3];
     }
   }
-  return { city, state, country, zip };
+  // Omit undefined properties
+  const loc: JobLocation = {};
+  if (city !== undefined) loc.city = city;
+  if (state !== undefined) loc.state = state;
+  if (country !== undefined) loc.country = country;
+  if (zip !== undefined) loc.zip = zip;
+  return loc;
 };
 
 /**
@@ -204,13 +207,12 @@ export const extractSkills = (input: string): string[] => {
   if (!input) return [];
   const foundSkills = new Set<string>();
   const lowerInput = input.toLowerCase();
-  // Check for each alias in the input
   for (const [alias, canonical] of Object.entries(SKILL_ALIASES)) {
-    // Use word boundaries to avoid partial matches
     const regex = new RegExp(`\\b${alias.replace(/\./g, '\\.')}(s)?\\b`, 'i');
     if (regex.test(lowerInput)) {
       foundSkills.add(canonical);
     }
   }
-  return Array.from(foundSkills);
+  // Return sorted array for deterministic output
+  return Array.from(foundSkills).sort();
 };

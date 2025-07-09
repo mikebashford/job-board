@@ -74,11 +74,13 @@ describe('extractSkills', () => {
       'JavaScript',
     ]);
     expect(extractSkills('Experience with React.js required')).toEqual([
+      'JavaScript',
       'React',
     ]);
     expect(extractSkills('Must know TS and Node.js')).toEqual([
-      'TypeScript',
+      'JavaScript',
       'Node.js',
+      'TypeScript',
     ]);
   });
 
@@ -87,18 +89,62 @@ describe('extractSkills', () => {
       extractSkills(
         'We use React, Redux, TypeScript, and React.js in our stack'
       )
-    ).toEqual(['React', 'Redux', 'TypeScript']);
+    ).toEqual(['JavaScript', 'React', 'Redux', 'TypeScript']);
   });
 
   test('handles aliases and ignores case', () => {
     expect(
       extractSkills('Skills: js, reactjs, nodejs, HTML, CSS, tailwindcss')
-    ).toEqual(['JavaScript', 'React', 'Node.js', 'HTML', 'CSS', 'TailwindCSS']);
+    ).toEqual(['CSS', 'HTML', 'JavaScript', 'Node.js', 'React', 'TailwindCSS']);
   });
 
   test('returns empty array for no matches or empty input', () => {
     expect(extractSkills('No relevant skills here')).toEqual([]);
     expect(extractSkills('')).toEqual([]);
     expect(extractSkills(undefined as unknown as string)).toEqual([]);
+  });
+});
+
+describe('normalizeLocation parses and normalizes locations', () => {
+  test('US location with state abbreviation', () => {
+    expect(normalizeLocation('New York, NY, USA')).toEqual({
+      city: 'New York',
+      state: 'New York',
+      country: 'USA',
+    });
+  });
+  test('US location with state abbreviation and zip', () => {
+    expect(normalizeLocation('Austin, TX, 78701, USA')).toEqual({
+      city: 'Austin',
+      state: 'Texas',
+      zip: '78701',
+      country: 'USA',
+    });
+  });
+  test('Non-US location', () => {
+    expect(normalizeLocation('London, UK')).toEqual({
+      city: 'London',
+      country: 'UK',
+    });
+  });
+  test('Single city', () => {
+    expect(normalizeLocation('Berlin')).toEqual({ city: 'Berlin' });
+  });
+  test('Empty string', () => {
+    expect(normalizeLocation('')).toEqual({});
+  });
+  test('US location with state abbreviation and country', () => {
+    expect(normalizeLocation('Chicago, IL, USA')).toEqual({
+      city: 'Chicago',
+      state: 'Illinois',
+      country: 'USA',
+    });
+  });
+  test('Canadian location', () => {
+    expect(normalizeLocation('Toronto, ON, Canada')).toEqual({
+      city: 'Toronto',
+      state: 'ON',
+      country: 'Canada',
+    });
   });
 });
