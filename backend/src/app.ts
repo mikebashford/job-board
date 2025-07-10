@@ -46,8 +46,12 @@ app.get(
       const location =
         typeof req.query.location === 'string' ? req.query.location : '';
       const page = req.query.page ? Number(req.query.page) : 1;
-      const jobs = await fetchJoobleJobs({ keywords, location, page });
-      res.json(jobs);
+      const { jobs, totalCount, totalPages } = await fetchJoobleJobs({
+        keywords,
+        location,
+        page,
+      });
+      res.json({ jobs, totalCount, totalPages, page });
     } catch (error) {
       console.error('Error fetching Jooble jobs:', error);
       res.status(500).json({ error: 'Failed to fetch Jooble jobs' });

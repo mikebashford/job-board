@@ -33,14 +33,17 @@ const JoobleJobsList = () => {
   const [location, setLocation] = useState('')
   const [experience, setExperience] = useState('')
   const [searching, setSearching] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
-  const fetchJobs = () => {
+  const fetchJobs = (pageOverride?: number) => {
     setLoading(true)
     setError(null)
     setSearching(true)
     const params = new URLSearchParams({
       keywords: title,
       location,
+      page: String(pageOverride ?? page),
       ...(experience ? { experience } : {}),
     })
     fetch(`http://localhost:4000/api/jobs/jooble?${params.toString()}`)
@@ -49,7 +52,9 @@ const JoobleJobsList = () => {
         return res.json()
       })
       .then(data => {
-        setJobs(data)
+        setJobs(data.jobs)
+        setTotalPages(data.totalPages || 1)
+        setPage(data.page || 1)
         setError(null)
       })
       .catch(err => {
@@ -63,13 +68,29 @@ const JoobleJobsList = () => {
   }
 
   useEffect(() => {
-    fetchJobs()
+    fetchJobs(1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    fetchJobs()
+    fetchJobs(1)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return
+    fetchJobs(newPage)
+  }
+
+  // Generate numbered page buttons (show up to 5 pages around current)
+  const getPageNumbers = () => {
+    const maxButtons = 5
+    let start = Math.max(1, page - Math.floor(maxButtons / 2))
+    const end = Math.min(totalPages, start + maxButtons - 1)
+    if (end - start < maxButtons - 1) {
+      start = Math.max(1, end - maxButtons + 1)
+    }
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
   }
 
   return (
@@ -122,14 +143,16 @@ const JoobleJobsList = () => {
             aria-label="Years of experience"
           />
         </div>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 min-w-[120px]"
-          disabled={searching}
-          aria-label="Search jobs"
-        >
-          {searching ? 'Searching...' : 'Search'}
-        </button>
+        <div className="flex flex-col w-full">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 w-full"
+            disabled={searching}
+            aria-label="Search jobs"
+          >
+            {searching ? 'Searching...' : 'Search'}
+          </button>
+        </div>
       </form>
       {loading ? (
         <div className="text-blue-700 text-lg">Loading Jooble jobs...</div>
@@ -138,45 +161,79 @@ const JoobleJobsList = () => {
       ) : jobs.length === 0 ? (
         <div className="text-gray-600">No jobs found.</div>
       ) : (
-        <ul className="space-y-4">
-          {jobs.map(job => (
-            <li key={job.sourceId} className="bg-white rounded-lg shadow p-4 flex flex-col gap-2">
-              <a
-                href={job.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xl font-semibold text-blue-700 hover:underline"
-                tabIndex={0}
-                aria-label={`View job: ${job.title} at ${job.companyName}`}
-              >
-                {job.title}
-              </a>
-              <div className="text-gray-700 font-medium">{job.companyName}</div>
-              <div className="text-gray-500 text-sm">
-                {job.location.city}
-                {job.location.state ? `, ${job.location.state}` : ''}
-                {job.location.country ? `, ${job.location.country}` : ''}
-                {job.isRemote && <span className="ml-2 text-green-600">Remote</span>}
-              </div>
-              {job.skills.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {job.skills.map(skill => (
-                    <span
-                      key={skill}
-                      className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+        <>
+          <ul className="space-y-4 mb-8">
+            {jobs.map(job => (
+              <li key={job.sourceId} className="bg-white rounded-lg shadow p-4 flex flex-col gap-2">
+                <a
+                  href={job.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xl font-semibold text-blue-700 hover:underline"
+                  tabIndex={0}
+                  aria-label={`View job: ${job.title} at ${job.companyName}`}
+                >
+                  {job.title}
+                </a>
+                <div className="text-gray-700 font-medium">{job.companyName}</div>
+                <div className="text-gray-500 text-sm">
+                  {job.location.city}
+                  {job.location.state ? `, ${job.location.state}` : ''}
+                  {job.location.country ? `, ${job.location.country}` : ''}
+                  {job.isRemote && <span className="ml-2 text-green-600">Remote</span>}
                 </div>
-              )}
-              <div
-                className="text-gray-600 text-sm line-clamp-2"
-                dangerouslySetInnerHTML={{ __html: job.description }}
-              />
-            </li>
-          ))}
-        </ul>
+                {job.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {job.skills.map(skill => (
+                      <span
+                        key={skill}
+                        className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div
+                  className="text-gray-600 text-sm line-clamp-2"
+                  dangerouslySetInnerHTML={{ __html: job.description }}
+                />
+              </li>
+            ))}
+          </ul>
+          {/* Pagination Controls */}
+          <nav className="flex justify-center items-center gap-2 mb-4" aria-label="Pagination">
+            <button
+              className="px-3 py-1 rounded bg-blue-100 text-blue-700 font-semibold disabled:opacity-50"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              aria-label="Previous page"
+            >
+              Previous
+            </button>
+            {getPageNumbers().map(num => (
+              <button
+                key={num}
+                className={`px-3 py-1 rounded font-semibold ${num === page ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+                onClick={() => handlePageChange(num)}
+                aria-current={num === page ? 'page' : undefined}
+              >
+                {num}
+              </button>
+            ))}
+            <button
+              className="px-3 py-1 rounded bg-blue-100 text-blue-700 font-semibold disabled:opacity-50"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              aria-label="Next page"
+            >
+              Next
+            </button>
+          </nav>
+          <div className="text-center text-gray-500 text-sm">
+            Page {page} of {totalPages}
+          </div>
+        </>
       )}
     </div>
   )
