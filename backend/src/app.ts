@@ -111,6 +111,45 @@ app.get(
         });
       }
 
+      // Salary range filter
+      const minSalary = req.query.minSalary
+        ? Number(req.query.minSalary)
+        : undefined;
+      const maxSalary = req.query.maxSalary
+        ? Number(req.query.maxSalary)
+        : undefined;
+      if (minSalary !== undefined || maxSalary !== undefined) {
+        filteredJobs = filteredJobs.filter((job) => {
+          // Only consider jobs with at least one salary value
+          if (
+            typeof job.salaryMin !== 'number' &&
+            typeof job.salaryMax !== 'number'
+          )
+            return false;
+          if (minSalary !== undefined) {
+            if (
+              typeof job.salaryMin === 'number' &&
+              job.salaryMin < minSalary &&
+              typeof job.salaryMax === 'number' &&
+              job.salaryMax < minSalary
+            ) {
+              return false;
+            }
+          }
+          if (maxSalary !== undefined) {
+            if (
+              typeof job.salaryMin === 'number' &&
+              job.salaryMin > maxSalary &&
+              typeof job.salaryMax === 'number' &&
+              job.salaryMax > maxSalary
+            ) {
+              return false;
+            }
+          }
+          return true;
+        });
+      }
+
       res.json({
         jobs: filteredJobs,
         totalCount: filteredJobs.length,

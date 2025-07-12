@@ -35,6 +35,8 @@ const JoobleJobsList = () => {
   const [searching, setSearching] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [minSalary, setMinSalary] = useState('')
+  const [maxSalary, setMaxSalary] = useState('')
 
   const fetchJobs = (pageOverride?: number) => {
     setLoading(true)
@@ -45,6 +47,8 @@ const JoobleJobsList = () => {
       location,
       page: String(pageOverride ?? page),
       ...(experience ? { experience } : {}),
+      ...(minSalary ? { minSalary } : {}),
+      ...(maxSalary ? { maxSalary } : {}),
     })
     fetch(`http://localhost:4000/api/jobs/jooble?${params.toString()}`)
       .then(res => {
@@ -101,7 +105,7 @@ const JoobleJobsList = () => {
         onSubmit={handleSubmit}
         aria-label="Job search form"
       >
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/5">
           <label htmlFor="job-title" className="text-sm font-medium text-gray-700 mb-1">
             Job Title
           </label>
@@ -115,7 +119,7 @@ const JoobleJobsList = () => {
             aria-label="Job title"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/5">
           <label htmlFor="location" className="text-sm font-medium text-gray-700 mb-1">
             Location
           </label>
@@ -129,7 +133,7 @@ const JoobleJobsList = () => {
             aria-label="Location"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/3">
+        <div className="flex flex-col w-full md:w-1/5">
           <label htmlFor="experience" className="text-sm font-medium text-gray-700 mb-1">
             Years of Experience
           </label>
@@ -146,6 +150,36 @@ const JoobleJobsList = () => {
             <option value="3-5">3-5 years</option>
             <option value="5+">5+ years</option>
           </select>
+        </div>
+        <div className="flex flex-col w-full md:w-1/5">
+          <label htmlFor="min-salary" className="text-sm font-medium text-gray-700 mb-1">
+            Minimum Salary
+          </label>
+          <input
+            id="min-salary"
+            type="number"
+            value={minSalary}
+            onChange={e => setMinSalary(e.target.value)}
+            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="e.g. 50000"
+            aria-label="Minimum salary"
+            min="0"
+          />
+        </div>
+        <div className="flex flex-col w-full md:w-1/5">
+          <label htmlFor="max-salary" className="text-sm font-medium text-gray-700 mb-1">
+            Maximum Salary
+          </label>
+          <input
+            id="max-salary"
+            type="number"
+            value={maxSalary}
+            onChange={e => setMaxSalary(e.target.value)}
+            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="e.g. 120000"
+            aria-label="Maximum salary"
+            min="0"
+          />
         </div>
         <div className="flex flex-col w-full">
           <button
