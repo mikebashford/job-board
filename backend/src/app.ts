@@ -51,7 +51,27 @@ app.get(
         location,
         page,
       });
-      res.json({ jobs, totalCount, totalPages, page });
+
+      // Strict filter: all keywords must be in BOTH title and description
+      const keywordList = keywords
+        .trim()
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean);
+      const filteredJobs = jobs.filter((job) => {
+        const title = (job.title || '').toLowerCase();
+        const description = (job.description || '').toLowerCase();
+        return keywordList.every(
+          (kw) => title.includes(kw) && description.includes(kw)
+        );
+      });
+
+      res.json({
+        jobs: filteredJobs,
+        totalCount: filteredJobs.length,
+        totalPages: Math.max(1, Math.ceil(filteredJobs.length / 20)),
+        page,
+      });
     } catch (error) {
       console.error('Error fetching Jooble jobs:', error);
       res.status(500).json({ error: 'Failed to fetch Jooble jobs' });
