@@ -58,13 +58,58 @@ app.get(
         .toLowerCase()
         .split(/\s+/)
         .filter(Boolean);
-      const filteredJobs = jobs.filter((job) => {
+      let filteredJobs = jobs.filter((job) => {
         const title = (job.title || '').toLowerCase();
         const description = (job.description || '').toLowerCase();
         return keywordList.every(
           (kw) => title.includes(kw) && description.includes(kw)
         );
       });
+
+      // Experience filter
+      const experience =
+        typeof req.query.experience === 'string' ? req.query.experience : '';
+      if (experience) {
+        filteredJobs = filteredJobs.filter((job) => {
+          const text = (
+            (job.title || '') +
+            ' ' +
+            (job.description || '')
+          ).toLowerCase();
+          if (experience === '0') {
+            return (
+              text.includes('0 years') ||
+              text.includes('no experience') ||
+              text.includes('entry level')
+            );
+          }
+          if (experience === '<3') {
+            // Match 0, 1, 2 years
+            return (
+              text.includes('0 years') ||
+              text.includes('1 year') ||
+              text.includes('2 years') ||
+              text.includes('no experience') ||
+              text.includes('entry level')
+            );
+          }
+          if (experience === '3-5') {
+            return (
+              /3\s*years/.test(text) ||
+              /4\s*years/.test(text) ||
+              /5\s*years/.test(text) ||
+              text.includes('3-5 years')
+            );
+          }
+          if (experience === '5+') {
+            return (
+              /([5-9]|1[0-9])\s*\+?\s*years/.test(text) ||
+              text.includes('5+ years')
+            );
+          }
+          return true;
+        });
+      }
 
       res.json({
         jobs: filteredJobs,

@@ -133,15 +133,19 @@ const JoobleJobsList = () => {
           <label htmlFor="experience" className="text-sm font-medium text-gray-700 mb-1">
             Years of Experience
           </label>
-          <input
+          <select
             id="experience"
-            type="text"
             value={experience}
             onChange={e => setExperience(e.target.value)}
             className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            placeholder="e.g. 3, 5+"
             aria-label="Years of experience"
-          />
+          >
+            <option value="">Any</option>
+            <option value="0">0 years</option>
+            <option value="<3">&lt;3 years</option>
+            <option value="3-5">3-5 years</option>
+            <option value="5+">5+ years</option>
+          </select>
         </div>
         <div className="flex flex-col w-full">
           <button
