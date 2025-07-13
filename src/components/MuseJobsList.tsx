@@ -203,16 +203,21 @@ const MuseJobsList = () => {
           <ul className="space-y-4 mb-8">
             {jobs.map(job => (
               <li key={job.sourceId} className="bg-white rounded-lg shadow p-4 flex flex-col gap-2">
-                <a
-                  href={job.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xl font-semibold text-blue-700 hover:underline"
-                  tabIndex={0}
-                  aria-label={`View job: ${job.title} at ${job.companyName}`}
-                >
-                  {job.title}
-                </a>
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className="text-xl font-semibold text-blue-700"
+                    tabIndex={0}
+                    aria-label={`Job title: ${job.title}`}
+                  >
+                    {job.title}
+                  </span>
+                  <span
+                    className="ml-auto bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold"
+                    aria-label="Source: The Muse"
+                  >
+                    Source: The Muse
+                  </span>
+                </div>
                 <div className="text-gray-700 font-medium">{job.companyName}</div>
                 <div className="text-gray-500 text-sm">
                   {job.location.city}
@@ -220,12 +225,42 @@ const MuseJobsList = () => {
                   {job.location.country ? `, ${job.location.country}` : ''}
                   {job.isRemote && <span className="ml-2 text-green-600">Remote</span>}
                 </div>
+                <div className="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
+                  {job.jobType && (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Job type">
+                      {job.jobType}
+                    </span>
+                  )}
+                  {job.experienceLevel && (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Experience level">
+                      {job.experienceLevel}
+                    </span>
+                  )}
+                  {job.industry && (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Industry">
+                      {job.industry}
+                    </span>
+                  )}
+                  {job.salaryMin && (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Salary range">
+                      {job.salaryCurrency || '$'}
+                      {job.salaryMin}
+                      {job.salaryMax ? ` - ${job.salaryCurrency || '$'}${job.salaryMax}` : ''}
+                    </span>
+                  )}
+                  {job.postedDate && (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Posted date">
+                      Posted: {job.postedDate}
+                    </span>
+                  )}
+                </div>
                 {job.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {job.skills.map(skill => (
                       <span
                         key={skill}
                         className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold"
+                        aria-label={`Skill: ${skill}`}
                       >
                         {skill}
                       </span>
@@ -233,8 +268,9 @@ const MuseJobsList = () => {
                   </div>
                 )}
                 <div
-                  className="text-gray-600 text-sm line-clamp-2"
+                  className="text-gray-600 text-sm line-clamp-4"
                   dangerouslySetInnerHTML={{ __html: job.description }}
+                  aria-label="Job description"
                 />
               </li>
             ))}
