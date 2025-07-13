@@ -34,7 +34,6 @@ const JoobleJobsList = () => {
   const [experience, setExperience] = useState('')
   const [searching, setSearching] = useState(false)
   const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
   const [minSalary, setMinSalary] = useState('')
   const [maxSalary, setMaxSalary] = useState('')
 
@@ -57,7 +56,6 @@ const JoobleJobsList = () => {
       })
       .then(data => {
         setJobs(data.jobs)
-        setTotalPages(data.totalPages || 1)
         setPage(data.page || 1)
         setError(null)
       })
@@ -79,22 +77,6 @@ const JoobleJobsList = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     fetchJobs(1)
-  }
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > totalPages) return
-    fetchJobs(newPage)
-  }
-
-  // Generate numbered page buttons (show up to 5 pages around current)
-  const getPageNumbers = () => {
-    const maxButtons = 5
-    let start = Math.max(1, page - Math.floor(maxButtons / 2))
-    const end = Math.min(totalPages, start + maxButtons - 1)
-    if (end - start < maxButtons - 1) {
-      start = Math.max(1, end - maxButtons + 1)
-    }
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
   }
 
   return (
@@ -275,38 +257,6 @@ const JoobleJobsList = () => {
               </li>
             ))}
           </ul>
-          {/* Pagination Controls */}
-          <nav className="flex justify-center items-center gap-2 mb-4" aria-label="Pagination">
-            <button
-              className="px-3 py-1 rounded bg-blue-100 text-blue-700 font-semibold disabled:opacity-50"
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-              aria-label="Previous page"
-            >
-              Previous
-            </button>
-            {getPageNumbers().map(num => (
-              <button
-                key={num}
-                className={`px-3 py-1 rounded font-semibold ${num === page ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
-                onClick={() => handlePageChange(num)}
-                aria-current={num === page ? 'page' : undefined}
-              >
-                {num}
-              </button>
-            ))}
-            <button
-              className="px-3 py-1 rounded bg-blue-100 text-blue-700 font-semibold disabled:opacity-50"
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages}
-              aria-label="Next page"
-            >
-              Next
-            </button>
-          </nav>
-          <div className="text-center text-gray-500 text-sm">
-            Page {page} of {totalPages}
-          </div>
         </>
       )}
     </div>
