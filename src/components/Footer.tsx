@@ -12,10 +12,6 @@ const Footer = () => (
         >
           GitHub
         </a>
-        <span className="mx-2">|</span>
-        <a href="/jooble-jobs" className="hover:underline text-blue-600" aria-label="Jooble Jobs">
-          Jooble Jobs
-        </a>
       </div>
     </div>
   </footer>

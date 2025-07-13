@@ -24,13 +24,6 @@ const Header = () => {
           >
             Home
           </Link>
-          <Link
-            to="/jooble-jobs"
-            className={`font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 px-2 py-1 rounded ${pathname === '/jooble-jobs' ? 'text-blue-600' : 'text-gray-700'}`}
-            aria-current={pathname === '/jooble-jobs' ? 'page' : undefined}
-          >
-            Jooble Jobs
-          </Link>
         </div>
       </nav>
     </header>
