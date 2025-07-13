@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import JoobleJobsList from './components/JoobleJobsList'
+import CombinedJobsList from './components/CombinedJobsList'
 import Header from './components/Header'
 import Footer from './components/Footer'
 
@@ -15,11 +15,11 @@ const App = () => {
             element={
               <>
                 {/* Job Source Selector Tabs */}
-                <JoobleJobsList />
+                <CombinedJobsList />
               </>
             }
           />
-          <Route path="/jooble-jobs" element={<JoobleJobsList />} />
+          <Route path="/jooble-jobs" element={<CombinedJobsList />} />
         </Routes>
       </main>
       <Footer />
