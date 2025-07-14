@@ -18,6 +18,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Set Content Security Policy (CSP) to allow fonts, styles, and resources from self and Google Fonts
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;"
+  );
+  next();
+});
+
 // Rate limiting: 60 requests per 10 minutes per IP
 const joobleLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
