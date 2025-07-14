@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import StripeJobsList from './jobs/StripeJobsList'
 
 type Job = {
   sourceId: string
@@ -121,14 +122,14 @@ const CombinedJobsList = () => {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
+    <div className="w-full mx-auto p-4">
       <h2 className="text-3xl font-bold mb-6 text-blue-800">All Jobs</h2>
       <form
         className="flex flex-col md:flex-row gap-4 mb-8 items-end bg-white p-4 rounded shadow"
         onSubmit={handleSubmit}
         aria-label="Job search form"
       >
-        <div className="flex flex-col w-full md:w-1/5">
+        <div className="flex flex-col w-full md:w-1/2">
           <label htmlFor="job-title" className="text-sm font-medium text-gray-700 mb-1">
             Job Title
           </label>
@@ -142,7 +143,7 @@ const CombinedJobsList = () => {
             aria-label="Job title"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/5">
+        <div className="flex flex-col w-full md:w-1/2">
           <label htmlFor="location" className="text-sm font-medium text-gray-700 mb-1">
             Location
           </label>
@@ -156,7 +157,7 @@ const CombinedJobsList = () => {
             aria-label="Location"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/5">
+        <div className="flex flex-col w-full md:w-1/2">
           <label htmlFor="experience" className="text-sm font-medium text-gray-700 mb-1">
             Years of Experience
           </label>
@@ -174,7 +175,7 @@ const CombinedJobsList = () => {
             <option value="5+">5+ years</option>
           </select>
         </div>
-        <div className="flex flex-col w-full md:w-1/5">
+        <div className="flex flex-col w-full md:w-1/2">
           <label htmlFor="min-salary" className="text-sm font-medium text-gray-700 mb-1">
             Minimum Salary
           </label>
@@ -189,7 +190,7 @@ const CombinedJobsList = () => {
             min="0"
           />
         </div>
-        <div className="flex flex-col w-full md:w-1/5">
+        <div className="flex flex-col w-full md:w-1/2">
           <label htmlFor="max-salary" className="text-sm font-medium text-gray-700 mb-1">
             Maximum Salary
           </label>
@@ -222,7 +223,7 @@ const CombinedJobsList = () => {
             <option value="30">Within a month</option>
           </select>
         </div>
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full md:w-1/2">
           <button
             type="submit"
             className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 w-full"
@@ -355,6 +356,10 @@ const CombinedJobsList = () => {
               </li>
             ))}
           </ul>
+          {/* Stripe Jobs Section */}
+          <div className="my-8">
+            <StripeJobsList query={title} />
+          </div>
           {/* Pagination Controls */}
           <nav className="flex justify-center items-center gap-2 mb-4" aria-label="Pagination">
             <button
