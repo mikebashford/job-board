@@ -56,6 +56,7 @@ const CombinedJobsList = () => {
   const [totalPages, setTotalPages] = useState(1)
   const [minSalary, setMinSalary] = useState('')
   const [maxSalary, setMaxSalary] = useState('')
+  const [postedWithin, setPostedWithin] = useState('')
   const pageSize = 20
 
   const fetchJobs = (pageOverride?: number) => {
@@ -70,6 +71,7 @@ const CombinedJobsList = () => {
       ...(minSalary ? { minSalary } : {}),
       ...(maxSalary ? { maxSalary } : {}),
       pageSize: String(pageSize),
+      ...(postedWithin ? { postedWithin } : {}),
     })
     fetch(`http://localhost:4000/api/jobs/combined?${params.toString()}`)
       .then(res => {
@@ -201,6 +203,24 @@ const CombinedJobsList = () => {
             aria-label="Maximum salary"
             min="0"
           />
+        </div>
+        <div className="flex flex-col w-full md:w-1/5">
+          <label htmlFor="posted-within" className="text-sm font-medium text-gray-700 mb-1">
+            Posted Within
+          </label>
+          <select
+            id="posted-within"
+            value={postedWithin}
+            onChange={e => setPostedWithin(e.target.value)}
+            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            aria-label="Posted within"
+          >
+            <option value="">Any time</option>
+            <option value="0">Recently (today)</option>
+            <option value="3">Within 3 days</option>
+            <option value="7">Within 7 days</option>
+            <option value="30">Within a month</option>
+          </select>
         </div>
         <div className="flex flex-col w-full">
           <button
