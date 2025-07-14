@@ -84,6 +84,11 @@ def main():
                 logging.info(f"Success: {company_name} | Title: {title}")
                 # Site-specific extraction for Stripe
                 if company_name.lower() == "stripe":
+                    # Save HTML for debugging
+                    debug_html_path = Path(__file__).parent / "stripe_debug.html"
+                    with open(debug_html_path, "w", encoding="utf-8") as debug_html_file:
+                        debug_html_file.write(page.content())
+                    logging.info(f"Saved Stripe debug HTML to {debug_html_path}")
                     jobs = extract_stripe_jobs(page)
                     stripe_jobs.extend(jobs)
                     logging.info(f"Extracted {len(jobs)} jobs from Stripe.")
