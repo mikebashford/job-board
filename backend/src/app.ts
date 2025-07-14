@@ -425,6 +425,20 @@ app.get('/api/jobs/combined', async (req: Request, res: Response) => {
       });
     }
 
+    const postedWithin = req.query.postedWithin
+      ? Number(req.query.postedWithin)
+      : undefined;
+    if (postedWithin !== undefined && !isNaN(postedWithin)) {
+      const now = new Date();
+      allJobs = allJobs.filter((job) => {
+        if (!job.postedDate) return false;
+        const posted = new Date(job.postedDate);
+        const diff = (now.getTime() - posted.getTime()) / (1000 * 60 * 60 * 24);
+        if (postedWithin === 0) return diff < 1; // today
+        return diff <= postedWithin;
+      });
+    }
+
     // Sort by postedDate descending (most recent first)
     allJobs.sort((a, b) => {
       const dateA = a.postedDate ? new Date(a.postedDate).getTime() : 0;
