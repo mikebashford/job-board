@@ -33,6 +33,17 @@ type ApiResponse = {
   pageSize: number
 }
 
+// Utility to format postedDate as 'X days ago'
+const getDaysAgo = (dateString?: string) => {
+  if (!dateString) return ''
+  const posted = new Date(dateString)
+  const now = new Date()
+  const diff = Math.floor((now.getTime() - posted.getTime()) / (1000 * 60 * 60 * 24))
+  if (isNaN(diff)) return ''
+  if (diff === 0) return 'today'
+  return `${diff} day${diff > 1 ? 's' : ''} ago`
+}
+
 const CombinedJobsList = () => {
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -217,26 +228,48 @@ const CombinedJobsList = () => {
                 className="bg-white rounded-lg shadow p-4 flex flex-col gap-2"
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <span
-                    className="text-xl font-semibold text-blue-700"
-                    tabIndex={0}
-                    aria-label={`Job title: ${job.title}`}
-                  >
-                    {job.title}
-                  </span>
-                  <span
-                    className="ml-auto bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold"
-                    aria-label={`Source: ${job.sourceName}`}
-                  >
-                    Source: {job.sourceName}
-                  </span>
+                  {job.sourceName === 'Remotive' && job.url ? (
+                    <a
+                      href={job.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xl font-semibold text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      tabIndex={0}
+                      aria-label={`Remotive job: ${job.title}`}
+                    >
+                      {job.title}
+                    </a>
+                  ) : (
+                    <span
+                      className="text-xl font-semibold text-blue-700"
+                      tabIndex={0}
+                      aria-label={`Job title: ${job.title}`}
+                    >
+                      {job.title}
+                    </span>
+                  )}
+                  <div className="flex flex-col items-end ml-auto">
+                    <span
+                      className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold"
+                      aria-label={`Source: ${job.sourceName}`}
+                    >
+                      Source: {job.sourceName}
+                    </span>
+                    {job.isRemote && (
+                      <span
+                        className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold mt-1 block"
+                        aria-label="Remote job"
+                      >
+                        Remote
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-gray-700 font-medium">{job.companyName}</div>
                 <div className="text-gray-500 text-sm">
                   {job.location.city}
                   {job.location.state ? `, ${job.location.state}` : ''}
                   {job.location.country ? `, ${job.location.country}` : ''}
-                  {job.isRemote && <span className="ml-2 text-green-600">Remote</span>}
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
                   {job.jobType && (
@@ -263,7 +296,7 @@ const CombinedJobsList = () => {
                   )}
                   {job.postedDate && (
                     <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Posted date">
-                      Posted: {job.postedDate}
+                      Posted: {getDaysAgo(job.postedDate)}
                     </span>
                   )}
                 </div>
@@ -285,6 +318,20 @@ const CombinedJobsList = () => {
                   dangerouslySetInnerHTML={{ __html: job.description }}
                   aria-label="Job description"
                 />
+                {job.sourceName === 'Remotive' && (
+                  <div className="text-xs text-blue-700 mt-2" aria-label="Remotive attribution">
+                    Source: Remotive (
+                    <a
+                      href="https://remotive.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      remotive.com
+                    </a>
+                    )
+                  </div>
+                )}
               </li>
             ))}
           </ul>
