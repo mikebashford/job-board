@@ -5,6 +5,7 @@ import { fetchJoobleJobs } from './apiClients/joobleClient';
 import { fetchMuseJobs } from './apiClients/theMuseClient';
 import rateLimit from 'express-rate-limit';
 import { searchAllSources } from './services/jobSearchOrchestrator';
+import { fetchUsaJobs } from './apiClients/usaJobsClient';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -326,12 +327,13 @@ app.get('/api/jobs/combined', async (req: Request, res: Response) => {
       : undefined;
     const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 20;
 
-    // Fetch from all sources in parallel
-    const [jooble, muse] = await Promise.all([
+    // Fetch from all sources in parallel (now includes USA Jobs)
+    const [jooble, muse, usaJobs] = await Promise.all([
       fetchJoobleJobs({ keywords, location, page: 1 }),
       fetchMuseJobs({ q: keywords, location, page: 1 }),
+      fetchUsaJobs({ Keyword: keywords, LocationName: location, Page: 1 }),
     ]);
-    let allJobs = [...jooble.jobs, ...muse.jobs];
+    let allJobs = [...jooble.jobs, ...muse.jobs, ...usaJobs.jobs];
 
     // Strict filter: all keywords must be in BOTH title and description
     const keywordList = keywords
@@ -484,6 +486,25 @@ app.get('/api/jobs/search', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error in unified job search:', error);
     res.status(500).json({ error: 'Failed to search jobs from all sources' });
+  }
+});
+
+app.get('/api/jobs/usa', async (req: Request, res: Response) => {
+  try {
+    const keywords =
+      typeof req.query.keywords === 'string' ? req.query.keywords : 'developer';
+    const location =
+      typeof req.query.location === 'string' ? req.query.location : '';
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const { jobs, totalCount, totalPages } = await fetchUsaJobs({
+      Keyword: keywords,
+      LocationName: location,
+      Page: page,
+    });
+    res.json({ jobs, totalCount, totalPages, page });
+  } catch (error) {
+    console.error('Error fetching USA Jobs:', error);
+    res.status(500).json({ error: 'Failed to fetch USA Jobs' });
   }
 });
 
