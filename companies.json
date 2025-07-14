@@ -1,0 +1,22 @@
+[
+  { "name": "Google", "url": "https://careers.google.com/jobs/results/" },
+  { "name": "Microsoft", "url": "https://jobs.careers.microsoft.com/us/en" },
+  { "name": "Amazon", "url": "https://www.amazon.jobs/en/" },
+  { "name": "Meta (Facebook)", "url": "https://www.metacareers.com/jobs/" },
+  { "name": "Apple", "url": "https://jobs.apple.com/en-us/search" },
+  { "name": "Netflix", "url": "https://jobs.netflix.com/search" },
+  { "name": "Airbnb", "url": "https://careers.airbnb.com/positions/" },
+  { "name": "Stripe", "url": "https://stripe.com/jobs/search" },
+  { "name": "GitHub", "url": "https://github.com/about/careers" },
+  { "name": "Shopify", "url": "https://www.shopify.com/careers" },
+  { "name": "Atlassian", "url": "https://www.atlassian.com/company/careers/all-jobs" },
+  { "name": "Dropbox", "url": "https://www.dropbox.com/jobs/list" },
+  { "name": "Salesforce", "url": "https://www.salesforce.com/company/careers/" },
+  { "name": "Twitter (X)", "url": "https://careers.twitter.com/en/work-for-twitter.html" },
+  { "name": "Zoom", "url": "https://careers.zoom.us/" },
+  { "name": "Slack", "url": "https://slack.com/careers" },
+  { "name": "LinkedIn", "url": "https://careers.linkedin.com/" },
+  { "name": "Indeed", "url": "https://www.indeed.jobs/" },
+  { "name": "Spotify", "url": "https://www.spotifyjobs.com/" },
+  { "name": "Adobe", "url": "https://adobe.wd5.myworkdayjobs.com/en-US/external_experience" }
+]
