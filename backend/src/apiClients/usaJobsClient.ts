@@ -27,9 +27,14 @@ export const fetchUsaJobs = async (
         params: { ...params, Page: page },
       });
       const items = response.data.SearchResult?.SearchResultItems || [];
-      const jobs = items.map(
-        (item: Record<string, unknown>) => item.MatchedObjectDescriptor || {}
-      );
+      const jobs = items.map((item: Record<string, unknown>) => {
+        const descriptor = item.MatchedObjectDescriptor;
+        const id = item.MatchedObjectId;
+        if (descriptor && typeof descriptor === 'object') {
+          return { ...descriptor, MatchedObjectId: id };
+        }
+        return { MatchedObjectId: id };
+      });
       const totalCount = response.data.SearchResult?.SearchResultCountAll || 0;
       const jobsPerPage = 25; // USA Jobs default
       const totalPages =

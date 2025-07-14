@@ -253,6 +253,7 @@ export const mapRemotiveJobToInternal = (
 };
 
 // USA Jobs API job mapping
+// sourceId must be set to MatchedObjectId for deduplication and tracking
 export const mapUsaJobsJobToInternal = (
   job: Record<string, unknown>
 ): NormalizedJob => {
