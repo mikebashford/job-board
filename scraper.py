@@ -4,6 +4,7 @@ import time
 import logging
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 # Configure logging
 LOG_FILE = Path(__file__).parent / "scraper.log"
@@ -47,8 +48,27 @@ def log_screenshot(page, company_name):
     except Exception as e:
         logging.warning(f"Failed to save screenshot for {company_name}: {e}")
 
+def extract_stripe_jobs(page):
+    """Extract job postings from Stripe's careers page."""
+    soup = BeautifulSoup(page.content(), "html.parser")
+    jobs = []
+    # Stripe jobs are in <a> tags with data-qa="job-link"
+    for job_link in soup.find_all("a", attrs={"data-qa": "job-link"}):
+        title_elem = job_link.find("span", attrs={"data-qa": "job-title"})
+        location_elem = job_link.find("span", attrs={"data-qa": "job-location"})
+        if not title_elem or not location_elem:
+            continue
+        job = {
+            "title": title_elem.get_text(strip=True),
+            "location": location_elem.get_text(strip=True),
+            "url": f"https://stripe.com{job_link.get('href')}"
+        }
+        jobs.append(job)
+    return jobs
+
 def main():
     results = []
+    stripe_jobs = []
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         for company in companies:
@@ -62,11 +82,15 @@ def main():
                 page.goto(url, timeout=30000)
                 title = page.title()
                 logging.info(f"Success: {company_name} | Title: {title}")
+                # Site-specific extraction for Stripe
+                if company_name.lower() == "stripe":
+                    jobs = extract_stripe_jobs(page)
+                    stripe_jobs.extend(jobs)
+                    logging.info(f"Extracted {len(jobs)} jobs from Stripe.")
                 results.append({"company": company_name, "url": url, "status": "success", "title": title})
             except Exception as e:
                 logging.error(f"Error scraping {company_name}: {e}")
                 log_screenshot(page, company_name)
-                # Optionally, save HTML snippet for debugging
                 try:
                     html_path = Path(__file__).parent / f"error_{company_name.replace(' ', '_')}.html"
                     with open(html_path, "w", encoding="utf-8") as html_file:
@@ -80,6 +104,12 @@ def main():
                 context.close()
                 random_delay()
         browser.close()
+    # Save Stripe jobs to JSON
+    if stripe_jobs:
+        stripe_jobs_path = Path(__file__).parent / "stripe_jobs.json"
+        with open(stripe_jobs_path, "w", encoding="utf-8") as f:
+            json.dump(stripe_jobs, f, indent=2, ensure_ascii=False)
+        logging.info(f"Saved {len(stripe_jobs)} Stripe jobs to {stripe_jobs_path}")
     # Print/log summary
     success_count = sum(1 for r in results if r["status"] == "success")
     error_count = sum(1 for r in results if r["status"] == "error")
