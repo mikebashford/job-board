@@ -6,6 +6,8 @@ import { fetchMuseJobs } from './apiClients/theMuseClient';
 import rateLimit from 'express-rate-limit';
 import { searchAllSources } from './services/jobSearchOrchestrator';
 import { fetchUsaJobs } from './apiClients/usaJobsClient';
+import fs from 'fs';
+import path from 'path';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -521,5 +523,40 @@ app.get('/api/jobs/usa', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to fetch USA Jobs' });
   }
 });
+
+/**
+ * GET /api/jobs/stripe
+ * Query params:
+ *   q: string (keyword to search in title, team, or location)
+ * Returns all jobs if no query is provided.
+ */
+app.get('/api/jobs/stripe', async (req: Request, res: Response) => {
+  try {
+    const jobsPath = path.resolve(__dirname, '../../../stripe_jobs.json');
+    const jobsRaw = fs.readFileSync(jobsPath, 'utf-8');
+    let jobs: StripeJob[] = JSON.parse(jobsRaw);
+    const q =
+      typeof req.query.q === 'string' ? req.query.q.trim().toLowerCase() : '';
+    if (q) {
+      jobs = jobs.filter(
+        (job) =>
+          (job.title && job.title.toLowerCase().includes(q)) ||
+          (job.team && job.team.toLowerCase().includes(q)) ||
+          (job.location && job.location.toLowerCase().includes(q))
+      );
+    }
+    res.json({ jobs, totalCount: jobs.length });
+  } catch (error) {
+    console.error('Error fetching Stripe jobs:', error);
+    res.status(500).json({ error: 'Failed to fetch Stripe jobs' });
+  }
+});
+
+type StripeJob = {
+  title: string;
+  url: string;
+  team: string;
+  location: string;
+};
 
 export default app;
