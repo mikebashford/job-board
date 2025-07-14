@@ -49,21 +49,36 @@ def log_screenshot(page, company_name):
         logging.warning(f"Failed to save screenshot for {company_name}: {e}")
 
 def extract_stripe_jobs(page):
-    """Extract job postings from Stripe's careers page."""
+    """Extract job postings from Stripe's careers page (table-based)."""
     soup = BeautifulSoup(page.content(), "html.parser")
     jobs = []
-    # Stripe jobs are in <a> tags with data-qa="job-link"
-    for job_link in soup.find_all("a", attrs={"data-qa": "job-link"}):
-        title_elem = job_link.find("span", attrs={"data-qa": "job-title"})
-        location_elem = job_link.find("span", attrs={"data-qa": "job-location"})
-        if not title_elem or not location_elem:
+    # Find the main job listings table (assume only one main table)
+    table = soup.find("table")
+    if not table:
+        return jobs
+    rows = table.find_all("tr")
+    for row in rows[1:]:  # Skip header row
+        cols = row.find_all("td")
+        if len(cols) < 3:
             continue
-        job = {
-            "title": title_elem.get_text(strip=True),
-            "location": location_elem.get_text(strip=True),
-            "url": f"https://stripe.com{job_link.get('href')}"
-        }
-        jobs.append(job)
+        # Title and URL
+        title_link = cols[0].find("a")
+        if not title_link:
+            continue
+        title = title_link.get_text(strip=True)
+        url = title_link.get("href")
+        if url and not url.startswith("http"):
+            url = f"https://stripe.com{url}"
+        # Team
+        team = cols[1].get_text(strip=True)
+        # Location
+        location = cols[2].get_text(strip=True)
+        jobs.append({
+            "title": title,
+            "url": url,
+            "team": team,
+            "location": location
+        })
     return jobs
 
 def main():
