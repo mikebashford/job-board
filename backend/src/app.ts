@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { fetchJoobleJobs } from './apiClients/joobleClient';
 import { fetchMuseJobs } from './apiClients/theMuseClient';
 import rateLimit from 'express-rate-limit';
+import { searchAllSources } from './services/jobSearchOrchestrator';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -444,6 +445,45 @@ app.get('/api/jobs/combined', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching combined jobs:', error);
     res.status(500).json({ error: 'Failed to fetch combined jobs' });
+  }
+});
+
+/**
+ * GET /api/jobs/search
+ * Query params:
+ *   q: string (job title/keywords, required)
+ *   maxJobsPerSource: number (optional, default 1000)
+ *   page: number (optional, for frontend pagination)
+ *   limit: number (optional, for frontend pagination)
+ */
+app.get('/api/jobs/search', async (req: Request, res: Response) => {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q : '';
+    if (!q) {
+      return res.status(400).json({ error: 'Missing required query param: q' });
+    }
+    const maxJobsPerSource = req.query.maxJobsPerSource
+      ? Number(req.query.maxJobsPerSource)
+      : 1000;
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const limit = req.query.limit ? Number(req.query.limit) : 50;
+
+    // Fetch jobs from all sources
+    const allJobs = await searchAllSources(q, maxJobsPerSource);
+    const totalCount = allJobs.length;
+    // Paginate combined results for frontend
+    const paginatedJobs = allJobs.slice((page - 1) * limit, page * limit);
+
+    res.json({
+      jobs: paginatedJobs,
+      totalCount,
+      totalPages: Math.max(1, Math.ceil(totalCount / limit)),
+      page,
+      limit,
+    });
+  } catch (error) {
+    console.error('Error in unified job search:', error);
+    res.status(500).json({ error: 'Failed to search jobs from all sources' });
   }
 });
 

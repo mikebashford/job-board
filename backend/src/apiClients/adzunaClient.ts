@@ -18,13 +18,14 @@ export const fetchAdzunaJobs = async (
   if (!appId || !apiKey)
     throw new Error('Missing ADZUNA_APP_ID or ADZUNA_API_KEY');
   const page = typeof params.page === 'number' ? params.page : 1;
+  const { page: _omit, ...restParams } = params; // Remove 'page' from params
   let attempt = 0;
   while (attempt < MAX_RETRIES) {
     try {
       const response = await axios.get(
         `https://api.adzuna.com/v1/api/jobs/us/search/${page}`,
         {
-          params: { ...params, app_id: appId, app_key: apiKey, page },
+          params: { ...restParams, app_id: appId, app_key: apiKey },
         }
       );
       const jobs = Array.isArray(response.data.results)

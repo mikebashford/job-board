@@ -194,7 +194,7 @@ export const mapAdzunaJobToInternal = (
   };
 };
 
-// Remotive API job mapping
+// Remotive API mapping: Must attribute jobs to Remotive and link to their URL. See https://remotive.com/api-documentation
 export const mapRemotiveJobToInternal = (
   job: Record<string, unknown>
 ): NormalizedJob => {

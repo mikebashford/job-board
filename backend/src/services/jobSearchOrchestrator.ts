@@ -34,22 +34,27 @@ export const searchAllSources = async (
     return jobs.slice(0, maxJobsPerSource);
   };
 
-  // Adzuna: paginated, 50/page
-  const adzunaPromise = fetchPaginated(ingestAdzunaJobs, 'q');
-  // USA Jobs: paginated, 25/page
-  const usaJobsPromise = fetchPaginated(ingestUsaJobs, 'Keyword');
-  // Remotive: no pagination, fetch once
-  const remotivePromise = ingestRemotiveJobs({ search: query }).then((res) =>
-    res.jobs.slice(0, maxJobsPerSource)
-  );
+  // Add per-source error handling and logging
+  const adzunaPromise = fetchPaginated(ingestAdzunaJobs, 'q').catch((e) => {
+    console.error('Adzuna error:', e?.response?.data || e.message || e);
+    return [];
+  });
+  const usaJobsPromise = fetchPaginated(ingestUsaJobs, 'Keyword').catch((e) => {
+    console.error('USA Jobs error:', e?.response?.data || e.message || e);
+    return [];
+  });
+  const remotivePromise = ingestRemotiveJobs({ search: query })
+    .then((res) => res.jobs.slice(0, maxJobsPerSource))
+    .catch((e) => {
+      console.error('Remotive error:', e?.response?.data || e.message || e);
+      return [];
+    });
 
-  // Run all in parallel
   const [adzunaJobs, usaJobs, remotiveJobs] = await Promise.all([
     adzunaPromise,
     usaJobsPromise,
     remotivePromise,
   ]);
 
-  // Combine all jobs
   return [...adzunaJobs, ...usaJobs, ...remotiveJobs];
 };
