@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import StripeJobsList from './jobs/StripeJobsList'
 
 type Job = {
   sourceId: string
@@ -356,10 +355,6 @@ const CombinedJobsList = () => {
               </li>
             ))}
           </ul>
-          {/* Stripe Jobs Section */}
-          <div className="my-8">
-            <StripeJobsList query={title} />
-          </div>
           {/* Pagination Controls */}
           <nav className="flex justify-center items-center gap-2 mb-4" aria-label="Pagination">
             <button

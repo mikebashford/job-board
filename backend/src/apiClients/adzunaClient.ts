@@ -17,8 +17,9 @@ export const fetchAdzunaJobs = async (
   const apiKey = process.env.ADZUNA_API_KEY;
   if (!appId || !apiKey)
     throw new Error('Missing ADZUNA_APP_ID or ADZUNA_API_KEY');
-  const page = typeof params.page === 'number' ? params.page : 1;
-  const { page: _omit, ...restParams } = params; // Remove 'page' from params
+  const { page: pageParam, ...restParams } = params; // Remove 'page' from params
+  const page = typeof pageParam === 'number' ? pageParam : 1;
+
   let attempt = 0;
   while (attempt < MAX_RETRIES) {
     try {

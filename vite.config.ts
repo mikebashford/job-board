@@ -12,7 +12,7 @@ export default defineConfig({
     {
       name: 'csp-header',
       configureServer(server: ViteDevServer) {
-        server.middlewares.use((req: IncomingMessage, res: ServerResponse, next: () => void) => {
+        server.middlewares.use((_: IncomingMessage, res: ServerResponse, next: () => void) => {
           res.setHeader(
             'Content-Security-Policy',
             "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:4000; font-src 'self' data: https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
