@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import JobCard from './jobs/JobCard'
 
 type Job = {
   sourceId: string
@@ -31,17 +32,6 @@ type ApiResponse = {
   totalPages: number
   page: number
   pageSize: number
-}
-
-// Utility to format postedDate as 'X days ago'
-const getDaysAgo = (dateString?: string) => {
-  if (!dateString) return ''
-  const posted = new Date(dateString)
-  const now = new Date()
-  const diff = Math.floor((now.getTime() - posted.getTime()) / (1000 * 60 * 60 * 24))
-  if (isNaN(diff)) return ''
-  if (diff === 0) return 'today'
-  return `${diff} day${diff > 1 ? 's' : ''} ago`
 }
 
 const CombinedJobsList = () => {
@@ -243,115 +233,8 @@ const CombinedJobsList = () => {
         <>
           <ul className="space-y-4 mb-8">
             {jobs.map(job => (
-              <li
-                key={job.sourceId + job.sourceName}
-                className="bg-white rounded-lg shadow p-4 flex flex-col gap-2"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  {job.sourceName === 'Remotive' && job.url ? (
-                    <a
-                      href={job.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xl font-semibold text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      tabIndex={0}
-                      aria-label={`Remotive job: ${job.title}`}
-                    >
-                      {job.title}
-                    </a>
-                  ) : (
-                    <span
-                      className="text-xl font-semibold text-blue-700"
-                      tabIndex={0}
-                      aria-label={`Job title: ${job.title}`}
-                    >
-                      {job.title}
-                    </span>
-                  )}
-                  <div className="flex flex-col items-end ml-auto">
-                    <span
-                      className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold"
-                      aria-label={`Source: ${job.sourceName}`}
-                    >
-                      Source: {job.sourceName}
-                    </span>
-                    {job.isRemote && (
-                      <span
-                        className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold mt-1 block"
-                        aria-label="Remote job"
-                      >
-                        Remote
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="text-gray-700 font-medium">{job.companyName}</div>
-                <div className="text-gray-500 text-sm">
-                  {job.location.city}
-                  {job.location.state ? `, ${job.location.state}` : ''}
-                  {job.location.country ? `, ${job.location.country}` : ''}
-                </div>
-                <div className="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
-                  {job.jobType && (
-                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Job type">
-                      {job.jobType}
-                    </span>
-                  )}
-                  {job.experienceLevel && (
-                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Experience level">
-                      {job.experienceLevel}
-                    </span>
-                  )}
-                  {job.industry && (
-                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Industry">
-                      {job.industry}
-                    </span>
-                  )}
-                  {job.salaryMin && (
-                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Salary range">
-                      {job.salaryCurrency || '$'}
-                      {job.salaryMin}
-                      {job.salaryMax ? ` - ${job.salaryCurrency || '$'}${job.salaryMax}` : ''}
-                    </span>
-                  )}
-                  {job.postedDate && (
-                    <span className="bg-gray-100 px-2 py-0.5 rounded" aria-label="Posted date">
-                      Posted: {getDaysAgo(job.postedDate)}
-                    </span>
-                  )}
-                </div>
-                {job.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {job.skills.map(skill => (
-                      <span
-                        key={skill}
-                        className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-semibold"
-                        aria-label={`Skill: ${skill}`}
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div
-                  className="text-gray-600 text-sm line-clamp-4"
-                  dangerouslySetInnerHTML={{ __html: job.description }}
-                  aria-label="Job description"
-                />
-                {job.sourceName === 'Remotive' && (
-                  <div className="text-xs text-blue-700 mt-2" aria-label="Remotive attribution">
-                    Source: Remotive (
-                    <a
-                      href="https://remotive.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline"
-                    >
-                      remotive.com
-                    </a>
-                    )
-                  </div>
-                )}
+              <li key={job.sourceId + job.sourceName}>
+                <JobCard job={job} />
               </li>
             ))}
           </ul>
