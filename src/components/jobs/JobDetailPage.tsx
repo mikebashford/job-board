@@ -42,6 +42,9 @@ const JobDetailPage: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [reportLoading, setReportLoading] = useState(false)
+  const [reportSuccess, setReportSuccess] = useState(false)
+  const [reportError, setReportError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   // Fetch job details
@@ -122,8 +125,26 @@ const JobDetailPage: React.FC = () => {
     }
   }
 
-  const handleReportClick = () => {
-    alert('Thank you for reporting this job. We will review it shortly.')
+  const handleReportClick = async () => {
+    if (!job) return
+    setReportLoading(true)
+    setReportError(null)
+    setReportSuccess(false)
+    try {
+      const res = await fetch('http://localhost:4000/api/jobs/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId: job.sourceId, reason: 'Broken link or spam' }),
+      })
+      if (!res.ok) throw new Error('Failed to report job')
+      setReportSuccess(true)
+    } catch (err: unknown) {
+      let message = 'Error reporting job'
+      if (err instanceof Error) message = err.message
+      setReportError(message)
+    } finally {
+      setReportLoading(false)
+    }
   }
 
   if (loading) {
@@ -205,11 +226,18 @@ const JobDetailPage: React.FC = () => {
           onClick={handleReportClick}
           className="px-5 py-2 rounded bg-red-100 text-red-700 font-semibold shadow hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-400"
           aria-label="Report this job as broken or spam"
+          disabled={reportLoading}
         >
-          Report Job
+          {reportLoading ? 'Reporting...' : 'Report Job'}
         </button>
       </div>
       {saveError && <div className="text-red-600 text-sm">{saveError}</div>}
+      {reportSuccess && (
+        <div className="text-green-700 text-sm">
+          Thank you for reporting this job. We will review it shortly.
+        </div>
+      )}
+      {reportError && <div className="text-red-600 text-sm">{reportError}</div>}
       <section>
         <h2 className="text-xl font-semibold text-blue-700 mb-2">Job Description</h2>
         <div
