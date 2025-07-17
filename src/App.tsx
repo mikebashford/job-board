@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import CombinedJobsList from './components/CombinedJobsList'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import JobDetailPage from './components/jobs/JobDetailPage'
 
 const App = () => {
   // Add job source selector state
@@ -20,6 +21,7 @@ const App = () => {
             }
           />
           <Route path="/jooble-jobs" element={<CombinedJobsList />} />
+          <Route path="/jobs/:jobId" element={<JobDetailPage />} />
         </Routes>
       </main>
       <Footer />
